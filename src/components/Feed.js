@@ -4,15 +4,17 @@ import {
     ListGroup,
     ListGroupItem,
     Button,
+    Badge,
     Pagination, 
     PaginationItem, 
     PaginationLink
 } from 'reactstrap'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 
-class PostFront extends React.Component {
-    constructor(props) {
-        super(props)
+class Feed extends React.Component {
+    constructor() {
+        super()
         
         this.pageSize = 50
         this.pagesCount = 1
@@ -55,7 +57,9 @@ class PostFront extends React.Component {
                 <ListGroup className="front-posts-list">
                     {posts.map((item) => (
                         <ListGroupItem key={item.id} tag="button">
-                            {item.statement}
+                            <Link to={`/post/${item.id}`}>
+                                {item.statement}  <Badge pill>3</Badge>
+                            </Link>
                         </ListGroupItem>
                     ))}
                 </ListGroup>
@@ -89,11 +93,10 @@ class PostFront extends React.Component {
                         />
 
                     </PaginationItem>
-
                 </Pagination>
             </Container>
         )
     }
 }
 
-export default PostFront
+export default Feed

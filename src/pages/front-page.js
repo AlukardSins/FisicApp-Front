@@ -1,29 +1,29 @@
-import axios from 'axios'
 import React from 'react'
+import {
+    BrowserRouter as Router,
+    Route 
+} from "react-router-dom";
 import { Container } from 'reactstrap'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import AppNavBar from '../components/AppNavBar'
-import FrontPosts from '../components/frontPosts'
+
+import Feed from '../components/Feed'
+import Post from '../components/Post'
+import Create from '../components/Create'
 
 class FrontPage extends React.Component {
-    getInitialProps(from, to) {
-        axios.get('/question')
-            .then()
-            .catch()
-    }
-
-    componentDidMount() {
-
-    }
-
     render() {
         return (
-            <Container className="page-body">
-                <AppNavBar />
-                <FrontPosts />
-            </Container>
+            <Router>
+                <Container className="front-page">
+                    <AppNavBar />
+                    <Route exact path="/" component={Feed} />
+                    <Route path="/post/:postId" component={Post} />
+                    <Route path="/create" component={Create} />
+                </Container>
+            </Router>
         )
     }
 }
