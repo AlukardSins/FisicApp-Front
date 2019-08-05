@@ -7,9 +7,12 @@ import {
     Badge,
     Pagination,
     PaginationItem,
-    PaginationLink
+    PaginationLink,
+    Col,
+    FormGroup
 } from 'reactstrap'
 import axios from 'axios'
+import ModalQualification from '../shared/modal-qualification'
 
 class Post extends React.Component {
     constructor(props) {
@@ -20,9 +23,11 @@ class Post extends React.Component {
 
         this.state = {
             currentPage: 0,
-            Q: [],
-            A: []
+            question: [],
+            answers: [],
+            qualifications : "sin calificacion"
         }
+        this.loadQualifications = this.loadQualifications.bind(this);
     }
 
     async componentDidMount() {
@@ -30,11 +35,12 @@ class Post extends React.Component {
             const question = await axios.get(`/question/${this.props.match.params.postId}`)
             const answer = await axios.get(`/question/${this.props.match.params.postId}/answers`)
             this.pagesCount = Math.ceil(answer.data.length / this.pageSize)
-            this.setState({ Q: question.data, A:answer.data })
+            this.setState({ question: question.data, answers:answer.data })
             console.log(question,answer)
         } catch (e) {
             console.log(e)
         }
+        await this.loadQualifications();
     }
 
     handleClick(e, index) {
@@ -42,14 +48,36 @@ class Post extends React.Component {
         this.setState({ currentPage: index })
     }
 
+    averageQualifications(qualifications){
+        console.log(qualifications)
+        if(qualifications.length !== 0){
+            const sum = qualifications
+                            .map(qualification => qualification.qualification)
+                            .reduce((previous, current) => current += previous);
+            this.setState({qualifications : sum / qualifications.length})
+        }
+    }
+
+    loadQualifications(){
+        axios.get(`/question_qualification?filter=%7B%22where%22%3A%7B%22id_question%22%3A%22${this.props.match.params.postId}%22%7D%7D`)
+            .then(data => this.averageQualifications(data.data))
+    }
+
     render() {
-        const answers = this.state.A
+        const answers = this.state.answers
         const { currentPage } = this.state
-        console.log(this.state)
         return(
             <Container className="post-card">
-                <h1>{this.state.Q.statement}</h1>
-                <img src={this.state.Q.url} alt="Problem img" />
+                <FormGroup row>
+                    <Col sm={10}>
+                        <h1>{this.state.question.statement}</h1>
+                        <h4>Calificacion: {this.state.qualifications}</h4>
+                    </Col>
+                    <Col sm={2}>
+                        <ModalQualification idQuestion={this.state.question.id} updateQualifications={this.loadQualifications}></ModalQualification>
+                    </Col>
+                </FormGroup>
+                <img src={this.state.question.url} alt="Problem img" />
                 <Button
                     color="primary"
                     size="lg"

@@ -11,6 +11,11 @@ import {
 } from 'reactstrap'
 import axios from 'axios'
 
+const ERROR_MESSAGE_DEFAULT = "Error al crear la pregunta";
+const ERROR_THEME = "Debe seleccionar un tema";
+const ERROR_POST = "La pregunta no puede estar vacia";
+const SUCCESS_MESSAGE = "Pregunta creada correctamente";
+
 class Create extends React.Component {
     constructor(props) {
         super(props)
@@ -22,7 +27,7 @@ class Create extends React.Component {
             post:"",
             error: false,
             success: false,
-            errorMessage: "Error al crear la pregunta"
+            errorMessage: ERROR_MESSAGE_DEFAULT
         }
         this.onDismissError = this.onDismissError.bind(this);
         this.onDismissSuccess = this.onDismissSuccess.bind(this);
@@ -45,7 +50,7 @@ class Create extends React.Component {
             statement : this.state.post,
             creation_date : new Date().getDate(),
             id_theme: this.state.theme
-        }).then(() => this.setState({success:true}))
+        }).then(() => this.showSuccessAlert())
     }
 
     async getModules(e) {
@@ -79,13 +84,11 @@ class Create extends React.Component {
 
     validaciones(){
         if(!this.state.theme){
-            console.log(this.state.theme)
-            this.setState({error:true})
+            this.showErrorAlert(ERROR_THEME)
             return true;
         }
         if(this.state.post === ""){
-            console.log(this.state.post)
-            this.setState({error:true})
+            this.showErrorAlert(ERROR_POST)
             return true;
         }
         return false;
@@ -99,12 +102,30 @@ class Create extends React.Component {
         this.setState({ success: false })
     }
 
+    showErrorAlert(errorMessage){
+        this.setState({
+            error:true,
+            errorMessage
+        });
+
+        window.setTimeout(()=>{
+            this.setState({error:false})
+        },5000)
+    }
+
+    showSuccessAlert(){
+        this.setState({success:true})
+        window.setTimeout(()=>{
+            this.setState({success:false})
+          },5000)
+    }
+
     render() {
         const state = this.state
         return (
             <Container>
                 <Alert color="success" isOpen={state.success} toggle={this.onDismissSuccess}>
-                    Pregunta creada correctamente
+                    {SUCCESS_MESSAGE}
                 </Alert>
                 <Alert color="warning" isOpen={state.error} toggle={this.onDismissError}>
                     {this.state.errorMessage}
