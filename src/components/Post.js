@@ -1,30 +1,19 @@
 import React from 'react'
 import {
     Container,
-    ListGroup,
-    ListGroupItem,
-    Button,
-    Badge,
-    Pagination,
-    PaginationItem,
-    PaginationLink,
     Col,
     FormGroup
 } from 'reactstrap'
 import axios from 'axios'
 import ModalQualification from '../shared/modal-qualification'
+import Answer from './Answer';
 
 class Post extends React.Component {
     constructor(props) {
         super(props)
 
-        this.pageSize = 50
-        this.pagesCount = 1
-
         this.state = {
-            currentPage: 0,
             question: [],
-            answers: [],
             qualifications : "sin calificacion"
         }
         this.loadQualifications = this.loadQualifications.bind(this);
@@ -33,10 +22,7 @@ class Post extends React.Component {
     async componentDidMount() {
         try {
             const question = await axios.get(`/question/${this.props.match.params.postId}`)
-            const answer = await axios.get(`/question/${this.props.match.params.postId}/answers`)
-            this.pagesCount = Math.ceil(answer.data.length / this.pageSize)
-            this.setState({ question: question.data, answers:answer.data })
-            console.log(question,answer)
+            this.setState({ question: question.data})
         } catch (e) {
             console.log(e)
         }
@@ -49,7 +35,6 @@ class Post extends React.Component {
     }
 
     averageQualifications(qualifications){
-        console.log(qualifications)
         if(qualifications.length !== 0){
             const sum = qualifications
                             .map(qualification => qualification.qualification)
@@ -64,8 +49,6 @@ class Post extends React.Component {
     }
 
     render() {
-        const answers = this.state.answers
-        const { currentPage } = this.state
         return(
             <Container className="post-card">
                 <FormGroup row>
@@ -78,51 +61,7 @@ class Post extends React.Component {
                     </Col>
                 </FormGroup>
                 <img src={this.state.question.url} alt="Problem img" />
-                <Button
-                    color="primary"
-                    size="lg"
-                    block
-                    href="/create"
-                    className="create-posts-btn"
-                >Responder
-                </Button>
-                <ListGroup className="front-posts-list">
-                    {answers.map((item) => (
-                        <ListGroupItem key={item.id} tag="button">                           
-                            {item.response}  <Badge pill>3</Badge>
-                        </ListGroupItem>
-                    ))}
-                </ListGroup>
-                <Pagination aria-label="Page navigation for front posts." className="front-posts-list-pager">
-
-                    <PaginationItem disabled={currentPage <= 0}>
-
-                        <PaginationLink
-                            onClick={e => this.handleClick(e, currentPage - 1)}
-                            previous
-                            href="#"
-                        />
-
-                    </PaginationItem>
-
-                    {[...Array(this.pagesCount)].map((page, i) =>
-                        <PaginationItem active={i === currentPage} key={i}>
-                            <PaginationLink onClick={e => this.handleClick(e, i)} href="#">
-                                {i + 1}
-                            </PaginationLink>
-                        </PaginationItem>
-                    )}
-
-                    <PaginationItem disabled={currentPage >= this.pagesCount - 1}>
-
-                        <PaginationLink
-                            onClick={e => this.handleClick(e, currentPage + 1)}
-                            next
-                            href="#"
-                        />
-
-                    </PaginationItem>
-                </Pagination>
+                <Answer idQuestion={this.props.match.params.postId}></Answer>
             </Container>
         )
     }
