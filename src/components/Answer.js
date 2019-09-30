@@ -5,44 +5,54 @@ import {
     ListGroupItem,
     Pagination, 
     PaginationItem, 
-    PaginationLink,
-    Button
+    PaginationLink
 } from 'reactstrap'
-import { Link } from 'react-router-dom'
 import axios from 'axios'
-import Theme from './Theme';
+import CreateAnswer from '../components/Create-Answer'
 
-class Feed extends React.Component {
-    constructor() {
-        super()
+const NO_ANSWERS = "No exiten Respuestas...";
+
+class Answer extends React.Component {
+    constructor(props) {
+        super(props)
         
         this.pageSize = 10
 
         this.state = {
             pagesCount: 1,
             currentPage: 0,
-            courses: [],
-            questions: []
+            answers: []
         }
+        this.loadAnswers = this.loadAnswers.bind(this)
     }
 
     async componentDidMount() {
         try {
-            await axios.get('/course').then(data => this.paginateCourses(data));
+            if(this.props.idQuestion){
+                await this.loadAnswers()
+            }  
         } catch (e) {
             console.log(e)            
         }
     }
 
-    paginateCourses(data){
-        const courses = []
-        const coursesTemp = data.data
-        const pagesCount = Math.ceil(coursesTemp.length / this.pageSize)
+    loadAnswers(){
+        axios.get(`/question/${this.props.idQuestion}/answers`).then(data => this.paginateData(data));
+    }
+
+    paginateData(data){
+        const answers = []
+        const answersTemp = data.data
+        if(answersTemp.length === 0){
+            this.setState({message:NO_ANSWERS})
+            return;
+        }
+        const pagesCount =  Math.ceil(answersTemp.length / this.pageSize)
         for(let i = 0; i<pagesCount; i++) {
-            courses[i] = coursesTemp.splice(0,this.pageSize)
+            answers[i] = answersTemp.splice(0,this.pageSize)
         }
         this.setState({
-            courses,
+            answers,
             pagesCount
         })
     }
@@ -53,31 +63,21 @@ class Feed extends React.Component {
     }
 
     render() {
-        const { currentPage, courses, pagesCount } = this.state
-        let coursesToShow = courses[currentPage] || courses;
+        const { currentPage, answers, pagesCount } = this.state
+        let answersToShow = answers[currentPage] || answers;
         return(
             <Container className="front-posts">
-
-                <Button
-                color="primary" 
-                size="lg" 
-                block
-                href="/create"
-                className="create-posts-btn">Crear Post
-                </Button>
-                <h2 className="mt-3">Cursos</h2>
+                <h2 className="mt-3">Respuestas</h2>
+                <h4 className="mt-3">{this.state.message}</h4>
                 <ListGroup className="mt-3">
-                    {coursesToShow.map((item) => (
-                        <ListGroupItem key={item.id} tag="button">
-                            <Link to={`/course/${item.id}`}>
-                                {item.name}
-                            </Link>
+                    {answersToShow.map((item) => (
+                        <ListGroupItem className="mt-2 text-left" key={item.id} tag="button">
+                                {item.response}
                         </ListGroupItem>
                     ))}
                 </ListGroup>
-
-                <Pagination aria-label="Page navigation for front posts." className="my-5 text-center">
-
+                {!this.state.message && this.state.pagesCount > 1 ? 
+                <Pagination aria-label="Page navigation for front posts." className="mt-5 text-center">
                     <PaginationItem disabled={currentPage <= 0}>
                         <PaginationLink
                             onClick={e => this.handleClick(e, currentPage - 1)}
@@ -85,7 +85,6 @@ class Feed extends React.Component {
                             href="#"
                         />
                     </PaginationItem>
-
                     {[...Array(pagesCount)].map((page, i) =>
                         <PaginationItem active={i === currentPage} key={i}>
                             <PaginationLink onClick={e => this.handleClick(e, i)} href="#">
@@ -93,7 +92,6 @@ class Feed extends React.Component {
                             </PaginationLink>
                         </PaginationItem>
                     )}
-
                     <PaginationItem disabled={currentPage >= pagesCount - 1}>
                         <PaginationLink
                             onClick={e => this.handleClick(e, currentPage + 1)}
@@ -101,11 +99,12 @@ class Feed extends React.Component {
                             href="#"
                         />
                     </PaginationItem>
-                </Pagination>
-                <Theme></Theme>
+                </Pagination>: null
+                }
+                <CreateAnswer idQuestion={this.props.idQuestion} loadAnswers={this.loadAnswers}></CreateAnswer>
             </Container>
         )
     }
 }
 
-export default Feed
+export default Answer

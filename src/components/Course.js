@@ -5,14 +5,12 @@ import {
     ListGroupItem,
     Pagination, 
     PaginationItem, 
-    PaginationLink,
-    Button
+    PaginationLink
 } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import Theme from './Theme';
 
-class Feed extends React.Component {
+class Course extends React.Component {
     constructor() {
         super()
         
@@ -21,28 +19,27 @@ class Feed extends React.Component {
         this.state = {
             pagesCount: 1,
             currentPage: 0,
-            courses: [],
-            questions: []
+            modules: []
         }
     }
 
     async componentDidMount() {
         try {
-            await axios.get('/course').then(data => this.paginateCourses(data));
+            await axios.get(`/course/${this.props.match.params.courseId}/modules`).then(data => this.paginateData(data));
         } catch (e) {
             console.log(e)            
         }
     }
 
-    paginateCourses(data){
-        const courses = []
-        const coursesTemp = data.data
-        const pagesCount = Math.ceil(coursesTemp.length / this.pageSize)
+    paginateData(data){
+        const modules = []
+        const modulesTemp = data.data
+        const pagesCount =  Math.ceil(modulesTemp.length / this.pageSize)
         for(let i = 0; i<pagesCount; i++) {
-            courses[i] = coursesTemp.splice(0,this.pageSize)
+            modules[i] = modulesTemp.splice(0,this.pageSize)
         }
         this.setState({
-            courses,
+            modules,
             pagesCount
         })
     }
@@ -53,30 +50,22 @@ class Feed extends React.Component {
     }
 
     render() {
-        const { currentPage, courses, pagesCount } = this.state
-        let coursesToShow = courses[currentPage] || courses;
+        const { currentPage, modules, pagesCount } = this.state
+        let modulesToShow = modules[currentPage] || modules;
         return(
             <Container className="front-posts">
-
-                <Button
-                color="primary" 
-                size="lg" 
-                block
-                href="/create"
-                className="create-posts-btn">Crear Post
-                </Button>
-                <h2 className="mt-3">Cursos</h2>
+                <h2 className="mt-3">Modulos</h2>
                 <ListGroup className="mt-3">
-                    {coursesToShow.map((item) => (
+                    {modulesToShow.map((item) => (
                         <ListGroupItem key={item.id} tag="button">
-                            <Link to={`/course/${item.id}`}>
+                            <Link to={`/module/${item.id}`}>
                                 {item.name}
                             </Link>
                         </ListGroupItem>
                     ))}
                 </ListGroup>
 
-                <Pagination aria-label="Page navigation for front posts." className="my-5 text-center">
+                <Pagination aria-label="Page navigation for front posts." className="mt-5 text-center">
 
                     <PaginationItem disabled={currentPage <= 0}>
                         <PaginationLink
@@ -102,10 +91,9 @@ class Feed extends React.Component {
                         />
                     </PaginationItem>
                 </Pagination>
-                <Theme></Theme>
             </Container>
         )
     }
 }
 
-export default Feed
+export default Course

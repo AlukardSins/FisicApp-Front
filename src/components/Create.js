@@ -48,14 +48,17 @@ class Create extends React.Component {
         }
         axios.post('/question',{
             statement : this.state.post,
-            creation_date : new Date().getDate(),
+            creation_date : new Date(),
             id_theme: this.state.theme
         }).then(() => this.showSuccessAlert())
     }
 
     async getModules(e) {
         e.preventDefault()
-        this.cleanData();
+        this.setState({
+            modules: [],
+            themes: []
+        });
         const modules = await axios.get('/course/' + e.target.value + '/modules')
         this.setState({ modules: modules.data })
     }
@@ -69,7 +72,8 @@ class Create extends React.Component {
     cleanData(){
         this.setState({
             modules: [],
-            themes: []
+            themes: [],
+            post:"",
         });
     }
 
@@ -114,6 +118,7 @@ class Create extends React.Component {
     }
 
     showSuccessAlert(){
+        this.cleanData()
         this.setState({success:true})
         window.setTimeout(()=>{
             this.setState({success:false})
