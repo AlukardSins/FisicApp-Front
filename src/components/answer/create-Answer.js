@@ -8,9 +8,11 @@ import {
     Alert
 } from 'reactstrap'
 import axios from 'axios'
+import LocalStorageService from '../../services/local-storage';
 
 const ERROR_MESSAGE_DEFAULT = "Error al crear la respuesta";
 const ERROR_ANSWER = "La respuesta no puede estar vacia";
+const ERROR_LOGIN = "Debe estar logeado para crear una respuesta";
 const SUCCESS_MESSAGE = "Respuesta creada correctamente";
 
 class CreateAnswer extends React.Component {
@@ -25,6 +27,11 @@ class CreateAnswer extends React.Component {
         }
         this.onDismissError = this.onDismissError.bind(this);
         this.onDismissSuccess = this.onDismissSuccess.bind(this);
+    }
+
+    componentDidMount(){
+        const token = LocalStorageService.getValue('token');
+        this.setState({token});
     }
     
     onSubmit() {
@@ -56,6 +63,10 @@ class CreateAnswer extends React.Component {
         if(this.state.answer === ""){
             this.showErrorAlert(ERROR_ANSWER)
             return true;
+        }
+        if(!this.state.token){
+            this.showErrorAlert(ERROR_LOGIN)
+            return true;   
         }
         return false;
     }

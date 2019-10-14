@@ -10,7 +10,7 @@ import {
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 
-class Module extends React.Component {
+class Post extends React.Component {
     constructor() {
         super()
         
@@ -19,27 +19,36 @@ class Module extends React.Component {
         this.state = {
             pagesCount: 1,
             currentPage: 0,
-            themes: []
+            posts: []
         }
     }
 
     async componentDidMount() {
         try {
-            await axios.get(`/module/${this.props.match.params.moduleId}/Themes`).then(data => this.paginateData(data));
+            if(this.props.match && this.props.match.params.themeId){
+                await axios.get(`/theme/${this.props.match.params.themeId}/Questions`).then(data => this.paginateData(data));
+            }else{
+                await axios.get(`/question`).then(data => this.paginateData(data));
+            }
+            
         } catch (e) {
             console.log(e)            
         }
     }
 
     paginateData(data){
-        const themes = []
-        const themesTemp = data.data
-        const pagesCount =  Math.ceil(themesTemp.length / this.pageSize)
+        const posts = []
+        const questions = data.data.sort((question1, question2) => {
+            const dateA = new Date(question1.creation_date)
+            const dateB = new Date(question2.creation_date);
+            return dateB - dateA;
+        })
+        const pagesCount =  Math.ceil(questions.length / this.pageSize)
         for(let i = 0; i<pagesCount; i++) {
-            themes[i] = themesTemp.splice(0,this.pageSize)
+            posts[i] = questions.splice(0,this.pageSize)
         }
         this.setState({
-            themes,
+            posts,
             pagesCount
         })
     }
@@ -50,16 +59,16 @@ class Module extends React.Component {
     }
 
     render() {
-        const { currentPage, themes, pagesCount } = this.state
-        let themesToShow = themes[currentPage] || themes;
+        const { currentPage, posts, pagesCount } = this.state
+        let postsToShow = posts[currentPage] || posts;
         return(
             <Container className="front-posts">
-                <h2 className="mt-3">Temas</h2>
+                <h2 className="mt-3">Preguntas</h2>
                 <ListGroup className="mt-3">
-                    {themesToShow.map((item) => (
+                    {postsToShow.map((item) => (
                         <ListGroupItem key={item.id} tag="button">
-                            <Link to={`/theme/${item.id}`}>
-                                {item.name}
+                            <Link to={`/post/${item.id}`}>
+                                {item.statement}
                             </Link>
                         </ListGroupItem>
                     ))}
@@ -96,4 +105,4 @@ class Module extends React.Component {
     }
 }
 
-export default Module
+export default Post

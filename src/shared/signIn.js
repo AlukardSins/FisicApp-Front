@@ -9,7 +9,6 @@ import {
     Alert
 } from 'reactstrap'
 import axios from 'axios'
-import SessionStorageService from '../services/local-storage';
 
 const ERROR_MESSAGE_DEFAULT = "Error al iniciar sesion";
 const ERROR_EMPTY = "Faltan campos";
@@ -21,6 +20,7 @@ class SignIn extends React.Component {
         this.state = {
             username:"",
             password:"",
+            role:"",
             error: false,
             errorMessage: ERROR_MESSAGE_DEFAULT
         }
@@ -35,9 +35,10 @@ class SignIn extends React.Component {
             username : this.state.username,
             password: this.state.password,
             email : this.state.email,
-            nickname: this.state.nickname
+            nickname: this.state.nickname,
+            role: this.state.role
         })
-        .then(() => window.location.reload())
+        .then(() => window.location = '/Login')
         .then(() => this.showErrorAlert(ERROR_MESSAGE_DEFAULT))
     }
 
@@ -86,7 +87,7 @@ class SignIn extends React.Component {
                     </FormGroup>
                     <FormGroup row>
                         <Col sm={12}>
-                            <Input type="password" name="email" id="email" placeholder="Email" value={state.email} onChange={e => this.onChange(e)}>
+                            <Input type="email" name="email" id="email" placeholder="Email" value={state.email} onChange={e => this.onChange(e)}>
                             </Input>
                         </Col>
                     </FormGroup>
@@ -99,6 +100,12 @@ class SignIn extends React.Component {
                     <FormGroup row>
                         <Col sm={12}>
                             <Input type="password" name="password" id="password" placeholder="Password" value={state.password} onChange={e => this.onChange(e)}>
+                            </Input>
+                        </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                        <Col sm={12}>
+                            <Input type="text" name="role" id="role" placeholder="Rol" value={state.role} onChange={e => this.onChange(e)}>
                             </Input>
                         </Col>
                     </FormGroup>

@@ -5,7 +5,7 @@ import {
     ListGroupItem,
     Pagination, 
     PaginationItem, 
-    PaginationLink
+    PaginationLink,
 } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
@@ -19,27 +19,28 @@ class Course extends React.Component {
         this.state = {
             pagesCount: 1,
             currentPage: 0,
-            modules: []
+            courses: [],
+            questions: []
         }
     }
 
     async componentDidMount() {
         try {
-            await axios.get(`/course/${this.props.match.params.courseId}/modules`).then(data => this.paginateData(data));
+            await axios.get('/course').then(data => this.paginateCourses(data));
         } catch (e) {
             console.log(e)            
         }
     }
 
-    paginateData(data){
-        const modules = []
-        const modulesTemp = data.data
-        const pagesCount =  Math.ceil(modulesTemp.length / this.pageSize)
+    paginateCourses(data){
+        const courses = []
+        const coursesTemp = data.data
+        const pagesCount = Math.ceil(coursesTemp.length / this.pageSize)
         for(let i = 0; i<pagesCount; i++) {
-            modules[i] = modulesTemp.splice(0,this.pageSize)
+            courses[i] = coursesTemp.splice(0,this.pageSize)
         }
         this.setState({
-            modules,
+            courses,
             pagesCount
         })
     }
@@ -50,22 +51,22 @@ class Course extends React.Component {
     }
 
     render() {
-        const { currentPage, modules, pagesCount } = this.state
-        let modulesToShow = modules[currentPage] || modules;
+        const { currentPage, courses, pagesCount } = this.state
+        let coursesToShow = courses[currentPage] || courses;
         return(
             <Container className="front-posts">
-                <h2 className="mt-3">Modulos</h2>
+                <h2 className="mt-3">Cursos</h2>
                 <ListGroup className="mt-3">
-                    {modulesToShow.map((item) => (
+                    {coursesToShow.map((item) => (
                         <ListGroupItem key={item.id} tag="button">
-                            <Link to={`/module/${item.id}`}>
+                            <Link to={`/course/${item.id}/module`}>
                                 {item.name}
                             </Link>
                         </ListGroupItem>
                     ))}
                 </ListGroup>
 
-                <Pagination aria-label="Page navigation for front posts." className="mt-5 text-center">
+                <Pagination aria-label="Page navigation for front posts." className="my-5 text-center">
 
                     <PaginationItem disabled={currentPage <= 0}>
                         <PaginationLink

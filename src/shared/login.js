@@ -9,7 +9,8 @@ import {
     Alert
 } from 'reactstrap'
 import axios from 'axios'
-import SessionStorageService from '../services/local-storage';
+import LocalStorageService from '../services/local-storage';
+import { Redirect } from 'react-router-dom'
 
 const ERROR_MESSAGE_DEFAULT = "Error al iniciar sesion";
 const ERROR_EMPTY = "Faltan campos";
@@ -36,10 +37,15 @@ class Login extends React.Component {
             password: this.state.password
         })
         .then(data => {
-            SessionStorageService.setValue('token',data.data.id)
-            window.location.reload()
-        })
-        .then(() => this.showErrorAlert(ERROR_MESSAGE_DEFAULT))
+            LocalStorageService.setValue('token',data.data.id)
+            this.loadUserInfo(data.data.userId)
+        },() => this.showErrorAlert(ERROR_MESSAGE_DEFAULT))
+    }
+
+    loadUserInfo(userid){
+        axios.get(`/app-user/${userid}`).then(data => {
+            LocalStorageService.setValue('userInfo',JSON.stringify(data.data))
+        }).then(()=>  window.location = '/')
     }
 
     onChange(e){
@@ -70,10 +76,21 @@ class Login extends React.Component {
         },5000)
     }
 
+    renderRedirect = () => {
+        if (this.state.signin) {
+          return <Redirect to='/SignIn' />
+        }
+    }
+
+    goToSignIn(){
+        this.setState({signin:true})
+    }
+
     render() {
         const state = this.state
         return (
             <Container>
+                {this.renderRedirect()}
                 <h2 className="my-3">Iniciar Sesion</h2>
                 <Alert color="warning" isOpen={state.error} toggle={this.onDismissError}>
                     {this.state.errorMessage}
@@ -91,13 +108,26 @@ class Login extends React.Component {
                             </Input>
                         </Col>
                     </FormGroup>
-                    <Button
-                        color="primary"
-                        size="lg"
-                        block
-                        className="Login-posts-btn"
-                        onClick={() => this.onSubmit()}>Login
-                    </Button>
+                    <FormGroup row>
+                        <Col sm={6}>
+                            <Button
+                                color="secondary"
+                                size="lg"
+                                block
+                                className="Login-posts-btn"
+                                onClick={() => this.goToSignIn()}>Ir a Registrarse
+                            </Button>
+                        </Col>
+                        <Col sm={6}>
+                            <Button
+                                color="primary"
+                                size="lg"
+                                block
+                                className="Login-posts-btn"
+                                onClick={() => this.onSubmit()}>Iniciar Sesion
+                            </Button>
+                        </Col>
+                    </FormGroup>
                 </Form>
             </Container>
         )

@@ -5,10 +5,10 @@ import {
     FormGroup
 } from 'reactstrap'
 import axios from 'axios'
-import ModalQualification from '../shared/modal-qualification'
-import Answer from './Answer';
+import ModalQualification from '../../shared/modal-qualification'
+import Answer from '../answer/answer';
 
-class Post extends React.Component {
+class PostDetail extends React.Component {
     constructor(props) {
         super(props)
 
@@ -57,14 +57,14 @@ class Post extends React.Component {
                         <h4>Calificacion: {this.state.qualifications}</h4>
                     </Col>
                     <Col sm={2}>
-                        <ModalQualification idQuestion={this.state.question.id} updateQualifications={this.loadQualifications}></ModalQualification>
+                        <ModalQualification tipo="pregunta" id={this.state.question.id} updateQualifications={this.loadQualifications}></ModalQualification>
                     </Col>
                 </FormGroup>
-                <img src={this.state.question.url} alt="Problem img" />
+                <img src={this.state.question.url} alt="Error al cargar la imagen" />
                 <Answer idQuestion={this.props.match.params.postId}></Answer>
             </Container>
         )
     }
 }
 
-export default Post
+export default PostDetail

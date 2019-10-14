@@ -10,11 +10,13 @@ import {
     Alert
 } from 'reactstrap'
 import axios from 'axios'
+import LocalStorageService from '../../services/local-storage';
 
 const ERROR_MESSAGE_DEFAULT = "Error al crear la pregunta";
 const ERROR_THEME = "Debe seleccionar un tema";
 const ERROR_POST = "La pregunta no puede estar vacia";
 const SUCCESS_MESSAGE = "Pregunta creada correctamente";
+const ERROR_LOGIN = "Debe estar logeado para crear una respuesta";
 
 class Create extends React.Component {
     constructor(props) {
@@ -40,6 +42,8 @@ class Create extends React.Component {
         } catch (e) {
             console.log(e)
         }
+        const token = LocalStorageService.getValue('token');
+        this.setState({token});
     }
     
     onSubmit() {
@@ -94,6 +98,10 @@ class Create extends React.Component {
         if(this.state.post === ""){
             this.showErrorAlert(ERROR_POST)
             return true;
+        }
+        if(!this.state.token){
+            this.showErrorAlert(ERROR_LOGIN)
+            return true;   
         }
         return false;
     }
