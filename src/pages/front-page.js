@@ -10,24 +10,39 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import AppNavBar from '../shared/AppNavBar'
 
 import Feed from '../components/Feed'
-import Post from '../components/Post'
-import Create from '../components/Create'
-import Course from '../components/Course';
-import Theme from '../components/Theme';
-import Module from '../components/Module';
+import PostDetail from '../components/post/postDetail'
+import Create from '../components/post/create'
+import Course from '../components/post/course';
+import Theme from '../components/post/theme';
+import Post from '../components/post/post';
+import Module from '../components/post/module';
+import SignIn from '../shared/signIn';
+import Login from '../shared/login';
+
 
 class FrontPage extends React.Component {
+
+    constructor(){
+        super()
+        this.state = {
+            token: null
+        }
+    }
+
     render() {
         return (
             <Router>
                 <Container className="front-page mb-5">
                     <AppNavBar />
                     <Route exact path="/" component={Feed} />
-                    <Route path="/post/:postId" component={Post} />
+                    <Route path="/post/:postId" component={PostDetail} />
                     <Route path="/create" component={Create} />
-                    <Route path="/course/:courseId" component={Course} />
-                    <Route path="/module/:moduleId" component={Module} />
-                    <Route path="/theme/:themeId" component={Theme} />
+                    <Route path="/courses" component={Course} />
+                    <Route path="/course/:courseId/module" component={Module} />
+                    <Route path="/module/:moduleId/theme" component={Theme} />
+                    <Route path="/theme/:themeId/post" component={Post} />
+                    <Route path="/SignIn" component={SignIn} />
+                    <Route path="/Login" component={Login} />
                 </Container>
             </Router>
         )

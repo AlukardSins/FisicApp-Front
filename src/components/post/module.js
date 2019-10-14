@@ -3,7 +3,6 @@ import {
     Container,
     ListGroup,
     ListGroupItem,
-    Badge,
     Pagination, 
     PaginationItem, 
     PaginationLink
@@ -11,7 +10,7 @@ import {
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 
-class Theme extends React.Component {
+class Module extends React.Component {
     constructor() {
         super()
         
@@ -20,36 +19,27 @@ class Theme extends React.Component {
         this.state = {
             pagesCount: 1,
             currentPage: 0,
-            posts: []
+            modules: []
         }
     }
 
     async componentDidMount() {
         try {
-            if(this.props.match && this.props.match.params.themeId){
-                await axios.get(`/theme/${this.props.match.params.themeId}/Questions`).then(data => this.paginateData(data));
-            }else{
-                await axios.get(`/question`).then(data => this.paginateData(data));
-            }
-            
+            await axios.get(`/course/${this.props.match.params.courseId}/modules`).then(data => this.paginateData(data));
         } catch (e) {
             console.log(e)            
         }
     }
 
     paginateData(data){
-        const posts = []
-        const questions = data.data.sort((question1, question2) => {
-            const dateA = new Date(question1.creation_date)
-            const dateB = new Date(question2.creation_date);
-            return dateB - dateA;
-        })
-        const pagesCount =  Math.ceil(questions.length / this.pageSize)
+        const modules = []
+        const modulesTemp = data.data
+        const pagesCount =  Math.ceil(modulesTemp.length / this.pageSize)
         for(let i = 0; i<pagesCount; i++) {
-            posts[i] = questions.splice(0,this.pageSize)
+            modules[i] = modulesTemp.splice(0,this.pageSize)
         }
         this.setState({
-            posts,
+            modules,
             pagesCount
         })
     }
@@ -60,16 +50,16 @@ class Theme extends React.Component {
     }
 
     render() {
-        const { currentPage, posts, pagesCount } = this.state
-        let postsToShow = posts[currentPage] || posts;
+        const { currentPage, modules, pagesCount } = this.state
+        let modulesToShow = modules[currentPage] || modules;
         return(
             <Container className="front-posts">
-                <h2 className="mt-3">Preguntas</h2>
+                <h2 className="mt-3">Modulos</h2>
                 <ListGroup className="mt-3">
-                    {postsToShow.map((item) => (
+                    {modulesToShow.map((item) => (
                         <ListGroupItem key={item.id} tag="button">
-                            <Link to={`/post/${item.id}`}>
-                                {item.statement}  <Badge pill>3</Badge>
+                            <Link to={`/module/${item.id}/theme`}>
+                                {item.name}
                             </Link>
                         </ListGroupItem>
                     ))}
@@ -106,4 +96,4 @@ class Theme extends React.Component {
     }
 }
 
-export default Theme
+export default Module

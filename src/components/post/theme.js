@@ -7,52 +7,39 @@ import {
     PaginationItem, 
     PaginationLink
 } from 'reactstrap'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
-import CreateAnswer from '../components/Create-Answer'
 
-const NO_ANSWERS = "No exiten Respuestas...";
-
-class Answer extends React.Component {
-    constructor(props) {
-        super(props)
+class Theme extends React.Component {
+    constructor() {
+        super()
         
         this.pageSize = 10
 
         this.state = {
             pagesCount: 1,
             currentPage: 0,
-            answers: []
+            themes: []
         }
-        this.loadAnswers = this.loadAnswers.bind(this)
     }
 
     async componentDidMount() {
         try {
-            if(this.props.idQuestion){
-                await this.loadAnswers()
-            }  
+            await axios.get(`/module/${this.props.match.params.moduleId}/Themes`).then(data => this.paginateData(data));
         } catch (e) {
             console.log(e)            
         }
     }
 
-    loadAnswers(){
-        axios.get(`/question/${this.props.idQuestion}/answers`).then(data => this.paginateData(data));
-    }
-
     paginateData(data){
-        const answers = []
-        const answersTemp = data.data
-        if(answersTemp.length === 0){
-            this.setState({message:NO_ANSWERS})
-            return;
-        }
-        const pagesCount =  Math.ceil(answersTemp.length / this.pageSize)
+        const themes = []
+        const themesTemp = data.data
+        const pagesCount =  Math.ceil(themesTemp.length / this.pageSize)
         for(let i = 0; i<pagesCount; i++) {
-            answers[i] = answersTemp.splice(0,this.pageSize)
+            themes[i] = themesTemp.splice(0,this.pageSize)
         }
         this.setState({
-            answers,
+            themes,
             pagesCount
         })
     }
@@ -63,21 +50,23 @@ class Answer extends React.Component {
     }
 
     render() {
-        const { currentPage, answers, pagesCount } = this.state
-        let answersToShow = answers[currentPage] || answers;
+        const { currentPage, themes, pagesCount } = this.state
+        let themesToShow = themes[currentPage] || themes;
         return(
             <Container className="front-posts">
-                <h2 className="mt-3">Respuestas</h2>
-                <h4 className="mt-3">{this.state.message}</h4>
+                <h2 className="mt-3">Temas</h2>
                 <ListGroup className="mt-3">
-                    {answersToShow.map((item) => (
-                        <ListGroupItem className="mt-2 text-left" key={item.id} tag="button">
-                                {item.response}
+                    {themesToShow.map((item) => (
+                        <ListGroupItem key={item.id} tag="button">
+                            <Link to={`/theme/${item.id}/post`}>
+                                {item.name}
+                            </Link>
                         </ListGroupItem>
                     ))}
                 </ListGroup>
-                {!this.state.message && this.state.pagesCount > 1 ? 
+
                 <Pagination aria-label="Page navigation for front posts." className="mt-5 text-center">
+
                     <PaginationItem disabled={currentPage <= 0}>
                         <PaginationLink
                             onClick={e => this.handleClick(e, currentPage - 1)}
@@ -85,6 +74,7 @@ class Answer extends React.Component {
                             href="#"
                         />
                     </PaginationItem>
+
                     {[...Array(pagesCount)].map((page, i) =>
                         <PaginationItem active={i === currentPage} key={i}>
                             <PaginationLink onClick={e => this.handleClick(e, i)} href="#">
@@ -92,6 +82,7 @@ class Answer extends React.Component {
                             </PaginationLink>
                         </PaginationItem>
                     )}
+
                     <PaginationItem disabled={currentPage >= pagesCount - 1}>
                         <PaginationLink
                             onClick={e => this.handleClick(e, currentPage + 1)}
@@ -99,12 +90,10 @@ class Answer extends React.Component {
                             href="#"
                         />
                     </PaginationItem>
-                </Pagination>: null
-                }
-                <CreateAnswer idQuestion={this.props.idQuestion} loadAnswers={this.loadAnswers}></CreateAnswer>
+                </Pagination>
             </Container>
         )
     }
 }
 
-export default Answer
+export default Theme
