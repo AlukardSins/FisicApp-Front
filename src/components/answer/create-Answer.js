@@ -38,7 +38,7 @@ class CreateAnswer extends React.Component {
         if(this.validaciones()){
             return;
         }
-        axios.post('/answer',{
+        axios.post('https://fisicapp.herokuapp.com/api/answer',{
             response : this.state.answer,
             creation_date : new Date(),
             id_question: this.props.idQuestion

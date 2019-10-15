@@ -31,7 +31,7 @@ class SignIn extends React.Component {
         if(this.validaciones()){
             return;
         }
-        axios.post('/app-user',{
+        axios.post('https://fisicapp.herokuapp.com/api/app-user',{
             username : this.state.username,
             password: this.state.password,
             email : this.state.email,

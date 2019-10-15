@@ -26,9 +26,9 @@ class Post extends React.Component {
     async componentDidMount() {
         try {
             if(this.props.match && this.props.match.params.themeId){
-                await axios.get(`/theme/${this.props.match.params.themeId}/Questions`).then(data => this.paginateData(data));
+                await axios.get(`https://fisicapp.herokuapp.com/api/theme/${this.props.match.params.themeId}/Questions`).then(data => this.paginateData(data));
             }else{
-                await axios.get(`/question`).then(data => this.paginateData(data));
+                await axios.get(`https://fisicapp.herokuapp.com/api/question`).then(data => this.paginateData(data));
             }
             
         } catch (e) {

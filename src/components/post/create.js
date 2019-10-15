@@ -47,7 +47,7 @@ class Create extends React.Component {
 
     async componentDidMount() {
         try {
-            const courses = await axios.get('/course')
+            const courses = await axios.get('https://fisicapp.herokuapp.com/api/course')
             this.setState({ courses: courses.data })
         } catch (e) {
             console.log(e)
@@ -69,7 +69,7 @@ class Create extends React.Component {
     }
 
     guardarPost(){
-        axios.post('/question',{
+        axios.post('https://fisicapp.herokuapp.com/api/question',{
             statement : this.state.post,
             creation_date : new Date(),
             id_theme: this.state.theme,
@@ -83,13 +83,13 @@ class Create extends React.Component {
             modules: [],
             themes: []
         });
-        const modules = await axios.get('/course/' + e.target.value + '/modules')
+        const modules = await axios.get('https://fisicapp.herokuapp.com/api/course/' + e.target.value + '/modules')
         this.setState({ modules: modules.data })
     }
 
     async getThemes(e) {
         e.preventDefault()
-        const themes = await axios.get('/module/' + e.target.value + '/Themes')
+        const themes = await axios.get('https://fisicapp.herokuapp.com/api/module/' + e.target.value + '/Themes')
         this.setState({ themes: themes.data })
     }
 

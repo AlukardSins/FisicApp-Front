@@ -26,7 +26,7 @@ class Course extends React.Component {
 
     async componentDidMount() {
         try {
-            await axios.get('/course').then(data => this.paginateCourses(data));
+            await axios.get('https://fisicapp.herokuapp.com/api/course').then(data => this.paginateCourses(data));
         } catch (e) {
             console.log(e)            
         }

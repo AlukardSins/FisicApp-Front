@@ -21,7 +21,7 @@ class PostDetail extends React.Component {
 
     async componentDidMount() {
         try {
-            const question = await axios.get(`/question/${this.props.match.params.postId}`)
+            const question = await axios.get(`https://fisicapp.herokuapp.com/api/question/${this.props.match.params.postId}`)
             this.setState({ question: question.data})
         } catch (e) {
             console.log(e)
@@ -44,7 +44,7 @@ class PostDetail extends React.Component {
     }
 
     loadQualifications(){
-        axios.get(`/question_qualification?filter=%7B%22where%22%3A%7B%22id_question%22%3A%22${this.props.match.params.postId}%22%7D%7D`)
+        axios.get(`https://fisicapp.herokuapp.com/api/question_qualification?filter=%7B%22where%22%3A%7B%22id_question%22%3A%22${this.props.match.params.postId}%22%7D%7D`)
             .then(data => this.averageQualifications(data.data))
     }
 
