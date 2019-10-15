@@ -60,7 +60,7 @@ class PostDetail extends React.Component {
                         <ModalQualification tipo="pregunta" id={this.state.question.id} updateQualifications={this.loadQualifications}></ModalQualification>
                     </Col>
                 </FormGroup>
-                <img src={this.state.question.url} alt="Error al cargar la imagen" />
+                <a href={this.state.question.url}><img src={this.state.question.url} className="img-fluid" alt="Error al cargar la imagen" /></a>
                 <Answer idQuestion={this.props.match.params.postId}></Answer>
             </Container>
         )

@@ -7,16 +7,23 @@ import {
     FormGroup,
     Label,
     Input,
-    Alert
+    Alert,
+    FormText
 } from 'reactstrap'
 import axios from 'axios'
 import LocalStorageService from '../../services/local-storage';
+import firebase from "../../services/firebase";
+import FileUploader from "react-firebase-file-uploader";
+import { Redirect } from 'react-router-dom'
+import cargando from '../../images/cargando.svg';
 
 const ERROR_MESSAGE_DEFAULT = "Error al crear la pregunta";
 const ERROR_THEME = "Debe seleccionar un tema";
+const ERROR_IMAGE_ONLY = "Solo se pueden cargar imagenes";
+const ERROR_UPLOAD_IMAGE = "Error al cargar la imagen";
 const ERROR_POST = "La pregunta no puede estar vacia";
 const SUCCESS_MESSAGE = "Pregunta creada correctamente";
-const ERROR_LOGIN = "Debe estar logeado para crear una respuesta";
+const ERROR_LOGIN = "Debe estar logeado para crear un post";
 
 class Create extends React.Component {
     constructor(props) {
@@ -29,6 +36,9 @@ class Create extends React.Component {
             post:"",
             error: false,
             success: false,
+            file: null,
+            fileUrl: null,
+            loading: false,
             errorMessage: ERROR_MESSAGE_DEFAULT
         }
         this.onDismissError = this.onDismissError.bind(this);
@@ -50,11 +60,21 @@ class Create extends React.Component {
         if(this.validaciones()){
             return;
         }
+        this.setState({loading:true})
+        if(this.state.file && !this.state.fileUrl){
+            this.startUploadImage()
+        }else{
+            this.guardarPost()
+        }
+    }
+
+    guardarPost(){
         axios.post('/question',{
             statement : this.state.post,
             creation_date : new Date(),
-            id_theme: this.state.theme
-        }).then(() => this.showSuccessAlert())
+            id_theme: this.state.theme,
+            url: this.state.fileUrl
+        }).then(() => this.setState({redirect:true,loading:false}))
     }
 
     async getModules(e) {
@@ -91,6 +111,10 @@ class Create extends React.Component {
     }
 
     validaciones(){
+        if(this.state.file && !this.state.file.type.startsWith('image')){
+            this.showErrorAlert(ERROR_IMAGE_ONLY)
+            return true;
+        }
         if(!this.state.theme){
             this.showErrorAlert(ERROR_THEME)
             return true;
@@ -133,19 +157,54 @@ class Create extends React.Component {
           },5000)
     }
 
+    customOnChangeHandler = (event) => {
+        const files = event.target.files;
+        this.setState({ file: files[0] });
+    }
+
+    startUploadImage(){
+        this.fileUploader.startUpload(this.state.file)
+    }
+
+    handleUploadError = (error) => {
+        this.showErrorAlert(ERROR_UPLOAD_IMAGE)
+        this.setState({loading:false})
+    }
+
+    handleUploadSuccess = filename => {
+        firebase
+            .storage()
+            .ref("images")
+            .child(filename)
+            .getDownloadURL()
+            .then(url => {
+                this.setState({ fileUrl: url })
+                this.guardarPost()
+            });
+    }
+
+    renderRedirect = () => {
+        if (this.state.redirect) {
+          return <Redirect to='/' />
+        }
+    }
+
     render() {
         const state = this.state
         return (
             <Container>
+                {this.renderRedirect()}
                 <Alert color="success" isOpen={state.success} toggle={this.onDismissSuccess}>
                     {SUCCESS_MESSAGE}
                 </Alert>
                 <Alert color="warning" isOpen={state.error} toggle={this.onDismissError}>
                     {this.state.errorMessage}
                 </Alert>
+                <h2 className="mt-3">Crear Post</h2>
+                <br/>
                 <Form>
                     <FormGroup row>
-                        <Label for="Course" sm={2}>Curso</Label>
+                        <Label for="Course" sm={2}>Curso: </Label>
                         <Col sm={10}>
                             <Input type="select" name="selectCourse" id="selCourse" placeholder="Selecciona el Curso" defaultValue="Selecciona el Curso" onChange={e => this.getModules(e)}
                                 disabled = {this.disabledIfEmpty(state.courses)}>
@@ -159,7 +218,7 @@ class Create extends React.Component {
                         </Col>
                     </FormGroup>
                     <FormGroup row>
-                        <Label for="Module" sm={2}>Modulo</Label>
+                        <Label for="Module" sm={2}>Modulo: </Label>
                         <Col sm={10}>
                             <Input type="select" name="selectModule" id="selModule" placeholder="Selecciona el Modulo" defaultValue="Selecciona el Modulo" onChange={e => this.getThemes(e)}
                                 disabled = {this.disabledIfEmpty(state.modules)}>
@@ -173,7 +232,7 @@ class Create extends React.Component {
                         </Col>
                     </FormGroup>
                     <FormGroup row>
-                        <Label for="Theme" sm={2}>Tema</Label>
+                        <Label for="Theme" sm={2}>Tema: </Label>
                         <Col sm={10}>
                             <Input type="select" name="theme" id="selTheme" placeholder="Selecciona el Tema" defaultValue="Selecciona el Tema" onChange={e => this.onChange(e)}
                                 disabled = {this.disabledIfEmpty(state.themes)}>
@@ -186,12 +245,32 @@ class Create extends React.Component {
                             </Input>
                         </Col>
                     </FormGroup>
+                    <br/>
                     <FormGroup row>
                         <Col sm={12}>
-                            <Input type="text" name="post" id="post" placeholder="Escriba la pregunta" value={state.post} onChange={e => this.onChange(e)}>
+                            <Label for="file">Escriba la pregunta</Label>
+                            <Input type="text" name="post" id="post" placeholder="pregunta" value={state.post} onChange={e => this.onChange(e)}>
                             </Input>
                         </Col>
                     </FormGroup>
+                    <br/>
+                    <FormGroup>
+                        <Label for="file">Cargar Imagen</Label>
+                        <br/>
+                        <FileUploader
+                        accept="image/*"
+                        randomizeFilename
+                        onChange={this.customOnChangeHandler}
+                        storageRef={firebase.storage().ref("images")} 
+                        onUploadError={this.handleUploadError}
+                        onUploadSuccess={this.handleUploadSuccess}
+                        ref={instance => { this.fileUploader = instance; } } 
+                        />
+                        <FormText color="muted">
+                        solo se puede cargar archivos con formato de imagen y de un tamaño menor a 5mb.
+                        </FormText>
+                    </FormGroup>
+                    <br/>
                     <Button
                         color="primary"
                         size="lg"
@@ -199,6 +278,7 @@ class Create extends React.Component {
                         className="create-posts-btn"
                         onClick={() => this.onSubmit()}>Crear Post
                     </Button>
+                    {this.state.loading ? <img src={cargando} alt="cargando..."></img>: null}
                 </Form>
             </Container>
         )
