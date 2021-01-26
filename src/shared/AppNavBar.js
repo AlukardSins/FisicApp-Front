@@ -54,7 +54,7 @@ class AppNavBar extends React.Component {
         return(
             <div>
                 {this.renderRedirect()}
-                <Navbar color="dark" dark expand="sm" className="mb-5">
+                <Navbar style={{backgroundColor: '#0A351C'}} dark expand="sm">
                     <Container>
                         <NavbarBrand href="/">FisicApp</NavbarBrand>
                         <NavbarToggler onClick={this.toggle} />

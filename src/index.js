@@ -7,7 +7,6 @@ import LocalStorageService from './services/local-storage';
 //Pages Import
 import Front from './pages/front-page';
 
-
 axios.interceptors.request.use(function (config) {
     config.headers.Authorization =  LocalStorageService.getValue('token');
     return config;

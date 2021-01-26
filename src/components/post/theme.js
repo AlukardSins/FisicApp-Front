@@ -25,7 +25,7 @@ class Theme extends React.Component {
 
     async componentDidMount() {
         try {
-            await axios.get(`/module/${this.props.match.params.moduleId}/Themes`).then(data => this.paginateData(data));
+            await axios.get(`https://fisicapp.herokuapp.com/api/module/${this.props.match.params.moduleId}/Themes`).then(data => this.paginateData(data));
         } catch (e) {
             console.log(e)            
         }

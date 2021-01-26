@@ -25,7 +25,7 @@ class Module extends React.Component {
 
     async componentDidMount() {
         try {
-            await axios.get(`/course/${this.props.match.params.courseId}/modules`).then(data => this.paginateData(data));
+            await axios.get(`https://fisicapp.herokuapp.com/api/course/${this.props.match.params.courseId}/modules`).then(data => this.paginateData(data));
         } catch (e) {
             console.log(e)            
         }

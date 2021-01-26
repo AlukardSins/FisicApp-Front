@@ -32,18 +32,20 @@ class FrontPage extends React.Component {
     render() {
         return (
             <Router>
-                <Container className="front-page mb-5">
+                <div className="front-page">
                     <AppNavBar />
-                    <Route exact path="/" component={Feed} />
-                    <Route path="/post/:postId" component={PostDetail} />
-                    <Route path="/create" component={Create} />
-                    <Route path="/courses" component={Course} />
-                    <Route path="/course/:courseId/module" component={Module} />
-                    <Route path="/module/:moduleId/theme" component={Theme} />
-                    <Route path="/theme/:themeId/post" component={Post} />
-                    <Route path="/SignIn" component={SignIn} />
-                    <Route path="/Login" component={Login} />
-                </Container>
+                    <Container style={{backgroundColor: 'white',minHeight:'100vh', paddingBottom:'40px', paddingTop: '40px'}}>
+                        <Route exact path="/" component={Feed} />
+                        <Route path="/post/:postId" component={PostDetail} />
+                        <Route path="/create" component={Create} />
+                        <Route path="/courses" component={Course} />
+                        <Route path="/course/:courseId/module" component={Module} />
+                        <Route path="/module/:moduleId/theme" component={Theme} />
+                        <Route path="/theme/:themeId/post" component={Post} />
+                        <Route path="/SignIn" component={SignIn} />
+                        <Route path="/Login" component={Login} />
+                    </Container>
+                </div>
             </Router>
         )
     }

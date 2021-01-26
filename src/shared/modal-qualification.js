@@ -33,7 +33,7 @@ class ModalQualification extends React.Component {
 
   addQualification(){
     if(this.props.tipo === "pregunta" && this.props.id){
-        axios.post('/question_qualification',{
+        axios.post('https://fisicapp.herokuapp.com/api/question_qualification',{
             description : this.state.description,
             qualification : this.state.qualification,
             id_question: this.props.id
@@ -43,7 +43,7 @@ class ModalQualification extends React.Component {
         },() => this.setState({error:true}))
     }
     if(this.props.tipo === "respuesta" && this.props.id){
-      axios.post('/answer_qualification',{
+      axios.post('https://fisicapp.herokuapp.com/api/answer_qualification',{
           description : this.state.description,
           qualification : this.state.qualification,
           id_answer: this.props.id

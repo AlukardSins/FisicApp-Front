@@ -32,7 +32,7 @@ class Login extends React.Component {
         if(this.validaciones()){
             return;
         }
-        axios.post('/app-user/login',{
+        axios.post('https://fisicapp.herokuapp.com/api/app-user/login',{
             username : this.state.username,
             password: this.state.password
         })
@@ -43,7 +43,7 @@ class Login extends React.Component {
     }
 
     loadUserInfo(userid){
-        axios.get(`/app-user/${userid}`).then(data => {
+        axios.get(`https://fisicapp.herokuapp.com/api/app-user/${userid}`).then(data => {
             LocalStorageService.setValue('userInfo',JSON.stringify(data.data))
         }).then(()=>  window.location = '/')
     }

@@ -41,7 +41,7 @@ class Answer extends React.Component {
     }
 
     loadAnswers(){
-        axios.get(`/question/${this.props.idQuestion}/answers`).then(data => this.paginateData(data));
+        axios.get(`https://fisicapp.herokuapp.com/api/question/${this.props.idQuestion}/answers`).then(data => this.paginateData(data));
     }
 
     paginateData(data){
@@ -84,7 +84,7 @@ class Answer extends React.Component {
         const { currentPage, answers } = this.state
         let answersToShow = answers[currentPage] || answers;
         answersToShow.forEach(answer => {
-            axios.get(`/answer_qualification?filter=%7B%22where%22%3A%7B%22id_answer%22%3A%22${answer.id}%22%7D%7D`)
+            axios.get(`https://fisicapp.herokuapp.com/api/answer_qualification?filter=%7B%22where%22%3A%7B%22id_answer%22%3A%22${answer.id}%22%7D%7D`)
             .then(data => this.averageQualifications(data.data, answer.id))
         });
     }
